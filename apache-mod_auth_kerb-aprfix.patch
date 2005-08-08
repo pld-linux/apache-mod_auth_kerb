@@ -1,0 +1,210 @@
+--- mod_auth_kerb-5.0-rc6.orig/src/mod_auth_kerb.c	2004-08-10 14:01:01.000000000 +0200
++++ mod_auth_kerb-5.0-rc6/src/mod_auth_kerb.c	2005-02-18 13:54:13.560145408 +0100
+@@ -105,7 +105,7 @@
+ #define MK_AUTH_TYPE r->ap_auth_type
+ #else
+ #define MK_POOL pool
+-#define MK_TABLE_GET ap_table_get
++#define MK_TABLE_GET apr_table_get
+ #define MK_USER r->connection->user
+ #define MK_AUTH_TYPE r->connection->ap_auth_type
+ #define PROXYREQ_PROXY STD_PROXY
+@@ -142,7 +142,7 @@
+ #ifdef STANDARD20_MODULE_STUFF
+ #define command(name, func, var, type, usage)           \
+   AP_INIT_ ## type (name, func,                         \
+-        (void*)APR_XtOffsetOf(kerb_auth_config, var),   \
++        (void*)APR_OFFSETOF(kerb_auth_config, var),   \
+         OR_AUTHCFG | RSRC_CONF, usage)
+ #else
+ #define command(name, func, var, type, usage) 		\
+@@ -231,7 +231,7 @@
+ {
+ 	kerb_auth_config *rec;
+ 
+-	rec = (kerb_auth_config *) ap_pcalloc(p, sizeof(kerb_auth_config));
++	rec = (kerb_auth_config *) apr_pcalloc(p, sizeof(kerb_auth_config));
+         ((kerb_auth_config *)rec)->krb_verify_kdc = 1;
+ 	((kerb_auth_config *)rec)->krb_service_name = "HTTP";
+ 	((kerb_auth_config *)rec)->krb_authoritative = 1;
+@@ -249,7 +249,7 @@
+ static const char*
+ krb5_save_realms(cmd_parms *cmd, kerb_auth_config *sec, char *arg)
+ {
+-   sec->krb_auth_realms= ap_pstrdup(cmd->pool, arg);
++   sec->krb_auth_realms= apr_pstrdup(cmd->pool, arg);
+    return NULL;
+ }
+ 
+@@ -387,9 +387,13 @@
+       return HTTP_INTERNAL_SERVER_ERROR;
+    }
+ 
+-   tkt_file_p = ap_pstrdup(r->pool, tkt_file);
++   tkt_file_p = apr_pstrdup(r->pool, tkt_file);
++#ifndef STANDARD20_MODULE_STUFF
+    ap_register_cleanup(r->pool, tkt_file_p,
+ 	               krb4_cache_cleanup, ap_null_cleanup);
++#else
++   apr_pool_cleanup_register(r->pool,tkt_file_p,krb4_cache_cleanup,apr_pool_cleanup_null);
++#endif
+ 
+    krb_set_tkt_string(tkt_file);
+ 
+@@ -432,14 +436,14 @@
+       goto end;
+    }
+ 
+-   user = ap_pstrdup(r->pool, sent_name);
++   user = apr_pstrdup(r->pool, sent_name);
+    if (sent_instance)
+-      user = ap_pstrcat(r->pool, user, ".", sent_instance, NULL);
+-   user = ap_pstrcat(r->pool, user, "@", realm, NULL);
++      user = apr_pstrcat(r->pool, user, ".", sent_instance, NULL);
++   user = apr_pstrcat(r->pool, user, "@", realm, NULL);
+ 
+    MK_USER = user;
+    MK_AUTH_TYPE = "Basic";
+-   ap_table_setn(r->subprocess_env, "KRBTKFILE", tkt_file_p);
++   apr_table_setn(r->subprocess_env, "KRBTKFILE", tkt_file_p);
+ 
+    if (!conf->krb_save_credentials)
+       krb4_cache_cleanup(tkt_file);
+@@ -677,7 +681,7 @@
+    int ret;
+    krb5_ccache tmp_ccache = NULL;
+ 
+-   ccname = ap_psprintf(r->pool, "FILE:%s/krb5cc_apache_XXXXXX", P_tmpdir);
++   ccname = apr_psprintf(r->pool, "FILE:%s/krb5cc_apache_XXXXXX", P_tmpdir);
+    fd = mkstemp(ccname + strlen("FILE:"));
+    if (fd < 0) {
+       log_rerror(APLOG_MARK, APLOG_ERR, 0, r,
+@@ -706,9 +710,13 @@
+       goto end;
+    }
+ 
+-   ap_table_setn(r->subprocess_env, "KRB5CCNAME", ccname);
++   apr_table_setn(r->subprocess_env, "KRB5CCNAME", ccname);
++#ifndef STANDARD20_MODULE_STUFF
+    ap_register_cleanup(r->pool, ccname,
+ 		       krb5_cache_cleanup, ap_null_cleanup);
++#else
++   apr_pool_cleanup_register(r->pool,ccname,krb5_cache_cleanup,apr_pool_cleanup_null);
++#endif
+ 
+    *ccache = tmp_ccache;
+    tmp_ccache = NULL;
+@@ -866,7 +874,7 @@
+       ret = HTTP_UNAUTHORIZED;
+       goto end;
+    }
+-   MK_USER = ap_pstrdup (r->pool, name);
++   MK_USER = apr_pstrdup (r->pool, name);
+    MK_AUTH_TYPE = "Basic";
+    free(name);
+ 
+@@ -902,7 +910,7 @@
+    gss_buffer_desc status_string;
+    char *err_msg;
+ 
+-   err_msg = ap_pstrdup(p, prefix);
++   err_msg = apr_pstrdup(p, prefix);
+    do {
+       maj_stat = gss_display_status (&min_stat,
+ 	                             err_maj,
+@@ -912,7 +920,7 @@
+ 				     &status_string);
+       if (GSS_ERROR(maj_stat))
+ 	 break;
+-      err_msg = ap_pstrcat(p, err_msg, ": ", (char*) status_string.value, NULL);
++      err_msg = apr_pstrcat(p, err_msg, ": ", (char*) status_string.value, NULL);
+       gss_release_buffer(&min_stat, &status_string);
+       
+       maj_stat = gss_display_status (&min_stat,
+@@ -922,7 +930,7 @@
+ 				     &msg_ctx,
+ 				     &status_string);
+       if (!GSS_ERROR(maj_stat)) {
+-	 err_msg = ap_pstrcat(p, err_msg,
++	 err_msg = apr_pstrcat(p, err_msg,
+ 	                      " (", (char*) status_string.value, ")", NULL);
+ 	 gss_release_buffer(&min_stat, &status_string);
+       }
+@@ -1135,15 +1143,15 @@
+      goto end;
+   }
+ 
+-  input_token.length = ap_base64decode_len(auth_param) + 1;
+-  input_token.value = ap_pcalloc(r->connection->pool, input_token.length);
++  input_token.length = apr_base64_decode_len(auth_param) + 1;
++  input_token.value = apr_pcalloc(r->connection->pool, input_token.length);
+   if (input_token.value == NULL) {
+      log_rerror(APLOG_MARK, APLOG_ERR, 0, r,
+-	   	"ap_pcalloc() failed (not enough memory)");
++	   	"apr_pcalloc() failed (not enough memory)");
+      ret = HTTP_INTERNAL_SERVER_ERROR;
+      goto end;
+   }
+-  input_token.length = ap_base64decode(input_token.value, auth_param);
++  input_token.length = apr_base64_decode(input_token.value, auth_param);
+ 
+   accept_sec_token = (cmp_gss_type(&input_token, &spnego_oid) == 0) ?
+      			gss_accept_sec_context_spnego : gss_accept_sec_context;
+@@ -1171,16 +1179,16 @@
+      char *token = NULL;
+      size_t len;
+      
+-     len = ap_base64encode_len(output_token.length) + 1;
+-     token = ap_pcalloc(r->connection->pool, len + 1);
++     len = apr_base64_encode_len(output_token.length) + 1;
++     token = apr_pcalloc(r->connection->pool, len + 1);
+      if (token == NULL) {
+ 	log_rerror(APLOG_MARK, APLOG_ERR, 0, r,
+-	           "ap_pcalloc() failed (not enough memory)");
++	           "apr_pcalloc() failed (not enough memory)");
+         ret = HTTP_INTERNAL_SERVER_ERROR;
+ 	gss_release_buffer(&minor_status2, &output_token);
+ 	goto end;
+      }
+-     ap_base64encode(token, output_token.value, output_token.length);
++     apr_base64_encode(token, output_token.value, output_token.length);
+      token[len] = '\0';
+      *negotiate_ret_value = token;
+      log_rerror(APLOG_MARK, APLOG_DEBUG, 0, r,
+@@ -1224,7 +1232,7 @@
+   }
+ 
+   MK_AUTH_TYPE = "Negotiate";
+-  MK_USER = ap_pstrdup(r->pool, output_token.value);
++  MK_USER = apr_pstrdup(r->pool, output_token.value);
+ 
+   if (conf->krb_save_credentials && delegated_cred != GSS_C_NO_CREDENTIAL)
+      store_gss_creds(r, conf, (char *)output_token.value, delegated_cred);
+@@ -1285,12 +1293,12 @@
+ #ifdef KRB5
+    if (negotiate_ret_value != NULL && conf->krb_method_gssapi) {
+       negoauth_param = (*negotiate_ret_value == '\0') ? "Negotiate" :
+-	          ap_pstrcat(r->pool, "Negotiate ", negotiate_ret_value, NULL);
+-      ap_table_add(r->err_headers_out, header_name, negoauth_param);
++	          apr_pstrcat(r->pool, "Negotiate ", negotiate_ret_value, NULL);
++      apr_table_add(r->err_headers_out, header_name, negoauth_param);
+    }
+    if ((use_krb5pwd && conf->krb_method_k5pass) || conf->krb_delegate_basic) {
+-      ap_table_add(r->err_headers_out, header_name,
+-		   ap_pstrcat(r->pool, "Basic realm=\"", auth_name, "\"", NULL));
++      apr_table_add(r->err_headers_out, header_name,
++		   apr_pstrcat(r->pool, "Basic realm=\"", auth_name, "\"", NULL));
+       set_basic = 1;
+    }
+ #endif
+@@ -1298,8 +1306,8 @@
+ #ifdef KRB4
+    if (!set_basic && 
+        ((use_krb4 && conf->krb_method_k4pass) || conf->krb_delegate_basic))
+-      ap_table_add(r->err_headers_out, header_name,
+-		  ap_pstrcat(r->pool, "Basic realm=\"", auth_name, "\"", NULL));
++      apr_table_add(r->err_headers_out, header_name,
++		  apr_pstrcat(r->pool, "Basic realm=\"", auth_name, "\"", NULL));
+ #endif
+ }
+
