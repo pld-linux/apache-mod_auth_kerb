@@ -37,6 +37,9 @@ uwierzytelnianie klientów HTTP z u¿yciem wpisów w katalogu Kerberosa.
 
 %build
 %configure
+
+sed -i 's/-pthread/-lpthread/' Makefile
+
 %{__make}
 
 %install
