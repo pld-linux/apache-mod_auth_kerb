@@ -12,16 +12,18 @@ Group:		Networking/Daemons
 Source0:	http://dl.sourceforge.net/modauthkerb/mod_%{mod_name}-%{version}-%{pre}.tar.gz
 # Source0-md5:	274edfb950af20ce6ef0ddcb7c20263a
 Source1:	%{name}.conf
-Patch1:     	%{name}-aprfix.patch
+Patch1:		%{name}-aprfix.patch
 URL:		http://modauthkerb.sourceforge.net/
 BuildRequires:	%{apxs}
 BuildRequires:	apache-devel
 BuildRequires:	gdbm-devel
 BuildRequires:	heimdal-devel
-Requires(post,preun):	%{apxs}
+BuildRequires:	sed >= 4.0
+Requires:	apache(modules-api) = %apache_modules_api
 BuildRoot:	%{tmpdir}/%{name}-%{version}-root-%(id -u -n)
 
-%define		_pkglibdir	%(%{apxs} -q LIBEXECDIR)
+%define		_pkglibdir	%(%{apxs} -q LIBEXECDIR 2>/dev/null)
+%define		_sysconfdir	%(%{apxs} -q SYSCONFDIR 2>/dev/null)
 
 %description
 This is an authentication module for Apache that allows you to
@@ -37,17 +39,15 @@ uwierzytelnianie klientów HTTP z u¿yciem wpisów w katalogu Kerberosa.
 
 %build
 %configure
-
-sed -i 's/-pthread/-lpthread/' Makefile
-
+%{__sed} -i -e 's/-pthread/-lpthread/' Makefile
 %{__make}
 
 %install
 rm -rf $RPM_BUILD_ROOT
-install -d $RPM_BUILD_ROOT{%{_pkglibdir},%{_sysconfdir}/httpd/httpd.conf}
+install -d $RPM_BUILD_ROOT{%{_pkglibdir},%{_sysconfdir}/httpd.conf}
 
 install src/.libs/mod_%{mod_name}.so $RPM_BUILD_ROOT%{_pkglibdir}
-install %{SOURCE1} $RPM_BUILD_ROOT%{_sysconfdir}/httpd/httpd.conf/20_%{mod_name}.conf
+install %{SOURCE1} $RPM_BUILD_ROOT%{_sysconfdir}/httpd.conf/20_mod_%{mod_name}.conf
 
 %clean
 rm -rf $RPM_BUILD_ROOT
@@ -67,5 +67,5 @@ fi
 %files
 %defattr(644,root,root,755)
 %doc README
+%attr(640,root,root) %config(noreplace) %verify(not md5 mtime size) %{_sysconfdir}/httpd.conf/*_mod_%{mod_name}.conf
 %attr(755,root,root) %{_pkglibdir}/*
-%{_sysconfdir}/httpd/httpd.conf/20_%{mod_name}.conf
