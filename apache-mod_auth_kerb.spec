@@ -1,7 +1,7 @@
 %define		mod_name	auth_kerb
 %define 	apxs	/usr/sbin/apxs
 Summary:	This is the Kerberos authentication module for Apache
-Summary(pl):	Modu≥ uwierzytelnienia Kerberos dla Apache
+Summary(pl.UTF-8):   Modu≈Ç uwierzytelnienia Kerberos dla Apache
 Name:		apache-mod_%{mod_name}
 Version:	5.0
 %define pre rc6
@@ -30,9 +30,9 @@ BuildRoot:	%{tmpdir}/%{name}-%{version}-root-%(id -u -n)
 This is an authentication module for Apache that allows you to
 authenticate HTTP clients using user entries in an Kerberos directory.
 
-%description -l pl
-To jest modu≥ uwierzytelnienia dla Apache pozwalaj±cy na
-uwierzytelnianie klientÛw HTTP z uøyciem wpisÛw w katalogu Kerberosa.
+%description -l pl.UTF-8
+To jest modu≈Ç uwierzytelnienia dla Apache pozwalajƒÖcy na
+uwierzytelnianie klient√≥w HTTP z u≈ºyciem wpis√≥w w katalogu Kerberosa.
 
 %prep
 %setup -q -n mod_%{mod_name}-%{version}-%{pre}
