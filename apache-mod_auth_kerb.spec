@@ -5,7 +5,7 @@ Summary(pl.UTF-8):	Moduł uwierzytelnienia Kerberos dla Apache
 Name:		apache-mod_%{mod_name}
 Version:	5.0
 %define pre rc6
-Release:	0.%{pre}.1
+Release:	0.%{pre}.2
 Epoch:		1
 License:	GPL
 Group:		Networking/Daemons
@@ -17,7 +17,7 @@ URL:		http://modauthkerb.sourceforge.net/
 BuildRequires:	%{apxs}
 BuildRequires:	apache-devel
 BuildRequires:	gdbm-devel
-BuildRequires:	heimdal-devel
+BuildRequires:	krb5-devel
 BuildRequires:	rpmbuild(macros) >= 1.268
 BuildRequires:	sed >= 4.0
 Requires:	apache(modules-api) = %apache_modules_api
