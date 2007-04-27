@@ -1,0 +1,3 @@
+- updated to 5.3 [fixes CVE-2006-5989]
+- removed obsolete aprfix
+- added krb4 bcond
