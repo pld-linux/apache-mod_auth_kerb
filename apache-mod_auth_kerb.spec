@@ -16,7 +16,7 @@ Source0:	http://dl.sourceforge.net/modauthkerb/mod_%{mod_name}-%{version}.tar.gz
 # Source0-md5:	a363588578050b3d320a2ceccf3ed666
 Source1:	%{name}.conf
 URL:		http://modauthkerb.sourceforge.net/
-BuildRequires:	%{apxs}
+BuildRequires:	apache-apxs >= 2.0
 BuildRequires:	apache-devel
 BuildRequires:	gdbm-devel
 BuildRequires:	krb5-devel
