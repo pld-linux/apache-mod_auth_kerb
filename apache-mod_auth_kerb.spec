@@ -25,8 +25,8 @@ BuildRequires:	sed >= 4.0
 Requires:	apache(modules-api) = %apache_modules_api
 BuildRoot:	%{tmpdir}/%{name}-%{version}-root-%(id -u -n)
 
-%define		pkgconfdir	%(%{apxs} -q SYSCONFDIR 2>/dev/null)/conf.d
-%define		pkglibdir	%(%{apxs} -q LIBEXECDIR 2>/dev/null)
+%define		apacheconfdir	%(%{apxs} -q SYSCONFDIR 2>/dev/null)/conf.d
+%define		apachelibdir	%(%{apxs} -q LIBEXECDIR 2>/dev/null)
 
 %description
 This is an authentication module for Apache that allows you to
@@ -50,10 +50,10 @@ uwierzytelnianie klientów HTTP z użyciem wpisów w katalogu Kerberosa.
 
 %install
 rm -rf $RPM_BUILD_ROOT
-install -d $RPM_BUILD_ROOT{%{pkglibdir},%{pkgconfdir}}
+install -d $RPM_BUILD_ROOT{%{apachelibdir},%{apacheconfdir}}
 
-install src/.libs/mod_%{mod_name}.so $RPM_BUILD_ROOT%{pkglibdir}
-install %{SOURCE1} $RPM_BUILD_ROOT%{pkgconfdir}/20_mod_%{mod_name}.conf
+install src/.libs/mod_%{mod_name}.so $RPM_BUILD_ROOT%{apachelibdir}
+install %{SOURCE1} $RPM_BUILD_ROOT%{apacheconfdir}/20_mod_%{mod_name}.conf
 
 %clean
 rm -rf $RPM_BUILD_ROOT
@@ -69,5 +69,5 @@ fi
 %files
 %defattr(644,root,root,755)
 %doc README
-%attr(640,root,root) %config(noreplace) %verify(not md5 mtime size) %{pkgconfdir}/*_mod_%{mod_name}.conf
-%attr(755,root,root) %{pkglibdir}/*.so
+%attr(640,root,root) %config(noreplace) %verify(not md5 mtime size) %{apacheconfdir}/*_mod_%{mod_name}.conf
+%attr(755,root,root) %{apachelibdir}/*.so
