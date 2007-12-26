@@ -8,7 +8,7 @@ Summary:	This is the Kerberos authentication module for Apache
 Summary(pl.UTF-8):	Moduł uwierzytelnienia Kerberos dla Apache
 Name:		apache-mod_%{mod_name}
 Version:	5.3
-Release:	1
+Release:	2
 Epoch:		1
 License:	GPL
 Group:		Networking/Daemons
@@ -25,8 +25,8 @@ BuildRequires:	sed >= 4.0
 Requires:	apache(modules-api) = %apache_modules_api
 BuildRoot:	%{tmpdir}/%{name}-%{version}-root-%(id -u -n)
 
-%define		_pkglibdir	%(%{apxs} -q LIBEXECDIR 2>/dev/null)
-%define		_sysconfdir	%(%{apxs} -q SYSCONFDIR 2>/dev/null)
+%define		pkgconfdir	%(%{apxs} -q SYSCONFDIR 2>/dev/null)/conf.d
+%define		pkglibdir	%(%{apxs} -q LIBEXECDIR 2>/dev/null)
 
 %description
 This is an authentication module for Apache that allows you to
@@ -50,10 +50,10 @@ uwierzytelnianie klientów HTTP z użyciem wpisów w katalogu Kerberosa.
 
 %install
 rm -rf $RPM_BUILD_ROOT
-install -d $RPM_BUILD_ROOT{%{_pkglibdir},%{_sysconfdir}/httpd.conf}
+install -d $RPM_BUILD_ROOT{%{pkglibdir},%{pkgconfdir}}
 
-install src/.libs/mod_%{mod_name}.so $RPM_BUILD_ROOT%{_pkglibdir}
-install %{SOURCE1} $RPM_BUILD_ROOT%{_sysconfdir}/httpd.conf/20_mod_%{mod_name}.conf
+install src/.libs/mod_%{mod_name}.so $RPM_BUILD_ROOT%{pkglibdir}
+install %{SOURCE1} $RPM_BUILD_ROOT%{pkgconfdir}/20_mod_%{mod_name}.conf
 
 %clean
 rm -rf $RPM_BUILD_ROOT
@@ -69,5 +69,5 @@ fi
 %files
 %defattr(644,root,root,755)
 %doc README
-%attr(640,root,root) %config(noreplace) %verify(not md5 mtime size) %{_sysconfdir}/httpd.conf/*_mod_%{mod_name}.conf
-%attr(755,root,root) %{_pkglibdir}/*.so
+%attr(640,root,root) %config(noreplace) %verify(not md5 mtime size) %{pkgconfdir}/*_mod_%{mod_name}.conf
+%attr(755,root,root) %{pkglibdir}/*.so
