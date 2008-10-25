@@ -11,7 +11,7 @@ Version:	5.3
 Release:	2
 Epoch:		1
 License:	GPL
-Group:		Networking/Daemons
+Group:		Networking/Daemons/HTTP
 Source0:	http://dl.sourceforge.net/modauthkerb/mod_%{mod_name}-%{version}.tar.gz
 # Source0-md5:	a363588578050b3d320a2ceccf3ed666
 Source1:	%{name}.conf
