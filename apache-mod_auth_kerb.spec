@@ -1,14 +1,10 @@
-#
-# Conditional build:
-%bcond_with	krb4		# build with Kerberos V4 support
-#
 %define		mod_name	auth_kerb
 %define 	apxs	/usr/sbin/apxs
 Summary:	This is the Kerberos authentication module for Apache
 Summary(pl.UTF-8):	Moduł uwierzytelnienia Kerberos dla Apache
 Name:		apache-mod_%{mod_name}
 Version:	5.3
-Release:	2
+Release:	3
 Epoch:		1
 License:	GPL
 Group:		Networking/Daemons/HTTP
@@ -19,7 +15,7 @@ URL:		http://modauthkerb.sourceforge.net/
 BuildRequires:	%{apxs}
 BuildRequires:	apache-devel >= 2.0
 BuildRequires:	gdbm-devel
-BuildRequires:	krb5-devel
+BuildRequires:	heimdal-devel
 BuildRequires:	rpmbuild(macros) >= 1.268
 BuildRequires:	sed >= 4.0
 Requires:	apache(modules-api) = %apache_modules_api
@@ -41,8 +37,7 @@ uwierzytelnianie klientów HTTP z użyciem wpisów w katalogu Kerberosa.
 
 %build
 %configure \
-	%{?with_krb4:--with-krb4} \
-	%{!?with_krb4:--without-krb4} \
+	--without-krb4 \
 	--with-apache=%{_prefix}
 
 %{__sed} -i -e 's/-pthread/-lpthread/' Makefile
