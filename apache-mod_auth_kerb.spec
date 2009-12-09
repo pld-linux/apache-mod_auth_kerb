@@ -11,6 +11,7 @@ Group:		Networking/Daemons/HTTP
 Source0:	http://dl.sourceforge.net/modauthkerb/mod_%{mod_name}-%{version}.tar.gz
 # Source0-md5:	642b81763ad3ca81dba359cb952da5e3
 Source1:	%{name}.conf
+Patch0:		%{name}-heimdal.patch
 URL:		http://modauthkerb.sourceforge.net/
 BuildRequires:	%{apxs}
 BuildRequires:	apache-devel >= 2.0
@@ -34,6 +35,7 @@ uwierzytelnianie klientów HTTP z użyciem wpisów w katalogu Kerberosa.
 
 %prep
 %setup -q -n mod_%{mod_name}-%{version}
+%patch0 -p1
 
 %build
 %configure \
