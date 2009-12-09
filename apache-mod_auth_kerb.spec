@@ -3,13 +3,13 @@
 Summary:	This is the Kerberos authentication module for Apache
 Summary(pl.UTF-8):	Moduł uwierzytelnienia Kerberos dla Apache
 Name:		apache-mod_%{mod_name}
-Version:	5.3
-Release:	4
+Version:	5.4
+Release:	1
 Epoch:		1
 License:	GPL
 Group:		Networking/Daemons/HTTP
 Source0:	http://dl.sourceforge.net/modauthkerb/mod_%{mod_name}-%{version}.tar.gz
-# Source0-md5:	a363588578050b3d320a2ceccf3ed666
+# Source0-md5:	642b81763ad3ca81dba359cb952da5e3
 Source1:	%{name}.conf
 URL:		http://modauthkerb.sourceforge.net/
 BuildRequires:	%{apxs}
