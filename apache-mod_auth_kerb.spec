@@ -4,7 +4,7 @@ Summary:	This is the Kerberos authentication module for Apache
 Summary(pl.UTF-8):	Moduł uwierzytelnienia Kerberos dla Apache
 Name:		apache-mod_%{mod_name}
 Version:	5.4
-Release:	4
+Release:	5
 Epoch:		1
 License:	GPL
 Group:		Networking/Daemons/HTTP
