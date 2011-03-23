@@ -1,0 +1,37 @@
+--- mod_auth_kerb-5.4/src/mod_auth_kerb.c~	2011-03-24 00:01:16.104419296 +0100
++++ mod_auth_kerb-5.4/src/mod_auth_kerb.c	2011-03-24 00:04:28.831007797 +0100
+@@ -157,6 +157,7 @@
+ 	int krb_verify_kdc;
+ 	const char *krb_service_name;
+ 	int krb_authoritative;
++	int krb_register_basic;
+ 	int krb_delegate_basic;
+ #if 0
+ 	int krb_ssl_preauthentication;
+@@ -218,6 +219,9 @@
+    command("KrbAuthoritative", ap_set_flag_slot, krb_authoritative,
+      FLAG, "Set to 'off' to allow access control to be passed along to lower modules iff the UserID is not known to this module."),
+ 
++   command("KrbRegisterBasic", ap_set_flag_slot, krb_register_basic,
++     FLAG, "If 'on' will register with AuthType Basic intead of Kerberos."),
++
+    command("KrbDelegateBasic", ap_set_flag_slot, krb_delegate_basic,
+      FLAG, "Always offer Basic authentication regardless of KrbMethodK5Pass and pass on authentication to lower modules if Basic headers arrive."),
+ 
+@@ -325,6 +329,7 @@
+         ((kerb_auth_config *)rec)->krb_verify_kdc = 1;
+ 	((kerb_auth_config *)rec)->krb_service_name = NULL;
+ 	((kerb_auth_config *)rec)->krb_authoritative = 1;
++	((kerb_auth_config *)rec)->krb_register_basic = 0;
+ 	((kerb_auth_config *)rec)->krb_delegate_basic = 0;
+ #if 0
+ 	((kerb_auth_config *)rec)->krb_ssl_preauthentication = 0;
+@@ -1636,6 +1641,8 @@
+       use_krb5 = 1;
+    else if(type && strcasecmp(type, "KerberosV4") == 0)
+       use_krb4 = 1;
++   else if (type && conf->krb_register_basic && strcasecmp(type, "Basic") == 0)
++      use_krb5 = use_krb4 = 1;
+    else
+       return DECLINED;
+ 
