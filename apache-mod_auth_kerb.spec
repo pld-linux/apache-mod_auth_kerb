@@ -1,10 +1,10 @@
 %define		mod_name	auth_kerb
-%define 	apxs	/usr/sbin/apxs
+%define		apxs	/usr/sbin/apxs
 Summary:	This is the Kerberos authentication module for Apache
 Summary(pl.UTF-8):	Moduł uwierzytelnienia Kerberos dla Apache
 Name:		apache-mod_%{mod_name}
 Version:	5.4
-Release:	7
+Release:	8
 Epoch:		1
 License:	GPL
 Group:		Networking/Daemons/HTTP
@@ -13,6 +13,8 @@ Source0:	http://dl.sourceforge.net/modauthkerb/mod_%{mod_name}-%{version}.tar.gz
 Source1:	%{name}.conf
 Patch0:		%{name}-heimdal.patch
 Patch1:		%{name}-basic-auth.patch
+Patch2:		mod_auth_kerb-apache24.patch
+Patch3:		mod_auth_kerb-delegation.patch
 URL:		http://modauthkerb.sourceforge.net/
 BuildRequires:	%{apxs}
 BuildRequires:	apache-devel >= 2.0
@@ -38,6 +40,8 @@ uwierzytelnianie klientów HTTP z użyciem wpisów w katalogu Kerberosa.
 %setup -q -n mod_%{mod_name}-%{version}
 %patch0 -p1
 %patch1 -p1
+%patch2 -p1
+%patch3 -p1
 
 %build
 %configure \
